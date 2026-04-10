@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Androx</title>
+
+<style>
+body {
+  margin: 0;
+  background-color: #020617;
+  background-image: url("./bg.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  color: white;
+  font-family: Arial;
+  overflow: hidden;
+}
+
+/* MENU */
+#menu, #endScreen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* BOX */
+.box {
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* TÍTULO */
+h1 {
+  margin-bottom: 5px;
+  letter-spacing: 4px;
+  text-shadow: 0 0 15px cyan;
+}
+
+/* AUTOR */
+.author {
+  margin-bottom: 15px;
+  font-size: 14px;
+  opacity: 0.7;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px cyan;
+}
+
+/* INPUT */
+select, button {
+  width: 200px;
+  padding: 10px;
+  margin-top: 10px;
+  background: #020617;
+  border: 1px solid #334155;
+  color: white;
+  border-radius: 6px;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:hover {
+  background: cyan;
+  color: black;
+}
+
+/* GAME */
+#gameWrap {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+canvas {
+  background: #020617;
+  border: 1px solid #1e293b;
+  box-shadow: 0 0 20px rgba(0,255,255,0.2);
+}
+
+/* HUD */
+#hud {
+  position: absolute;
+  top: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 30px;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px cyan;
+}
+</style>
+</head>
+
+<body>
+
+<!-- MENU -->
+<div id="menu">
+  <div class="box">
+    <h1>ANDROX</h1>
+    <p class="author">Autor: Renato André</p>
+
+    <div>Modo</div>
+    <select id="mode">
+      <option value="1">1 Jogador</option>
+      <option value="2">2 Jogadores</option>
+    </select>
+
+    <div>Dificuldade</div>
+    <select id="difficulty">
+      <option value="0.05">Fácil</option>
+      <option value="0.1">Médio</option>
+      <option value="0.2">Difícil</option>
+    </select>
+
+    <div>Rounds</div>
+    <select id="rounds">
+      <option value="3">3</option>
+      <option value="5">5</option>
+      <option value="10">10</option>
+    </select>
+
+    <button id="startBtn">JOGAR</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="gameWrap">
+  <div id="hud">
+    <span id="score1">0</span> : <span id="score2">0</span>
+  </div>
+  <canvas id="game" width="700" height="400"></canvas>
+</div>
+
+<!-- FINAL -->
+<div id="endScreen" style="display:none;">
+  <div class="box">
+    <h1 id="winnerText"></h1>
+    <button onclick="location.reload()">Jogar novamente</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
