@@ -6,13 +6,67 @@ let score1 = 0, score2 = 0;
 let mode, aiSpeed, maxRounds;
 let keys = {};
 
+let ballSpeedMultiplier = 1;
+let waitingStart = false;
+let lastScored = null;
+
+let music;
+let targetVolume = 0.4;
+
+/* NOVO: TRAIL + VELOCIDADE */
+let trail = [];
+let maxTrail = 15;
+
+let maxSpeed = 12;
+let speedIncrease = 0.0005;
+
 /* INIT */
 document.addEventListener("DOMContentLoaded", () => {
   canvas = document.getElementById("game");
   ctx = canvas.getContext("2d");
 
+  music = document.getElementById("bgMusic");
+
   document.getElementById("startBtn").addEventListener("click", startGame);
 });
+
+/* TESTE AUTOMÁTICO */
+document.addEventListener("click", () => {
+  if (music.paused) {
+    music.play().catch(() => {});
+  }
+});
+
+/* FADE IN */
+function fadeInMusic(){
+  music.volume = 0;
+  music.play().catch(err => console.log("Erro ao tocar:", err));
+
+  let vol = 0;
+  const fade = setInterval(() => {
+    vol += 0.02;
+    if(vol >= targetVolume){
+      vol = targetVolume;
+      clearInterval(fade);
+    }
+    music.volume = vol;
+  }, 100);
+}
+
+/* FADE OUT */
+function fadeOutMusic(){
+  let vol = music.volume;
+
+  const fade = setInterval(() => {
+    vol -= 0.02;
+    if(vol <= 0){
+      vol = 0;
+      music.pause();
+      clearInterval(fade);
+    }
+    music.volume = vol;
+  }, 100);
+}
 
 /* START */
 function startGame(){
@@ -25,14 +79,20 @@ function startGame(){
   document.getElementById("menu").style.display = "none";
   document.getElementById("gameWrap").style.display = "flex";
 
+  fadeInMusic();
+
   p1 = {x:20,y:150,w:10,h:100,speed:6};
   p2 = {x:670,y:150,w:10,h:100,speed:6};
 
-  ball = {x:350,y:200,size:10,dx:4,dy:3};
+  ball = {x:350,y:200,size:10,dx:0,dy:0};
 
   score1 = 0;
   score2 = 0;
 
+  ballSpeedMultiplier = 1;
+  lastScored = null;
+
+  startRound(true);
   loop();
 }
 
@@ -69,13 +129,64 @@ function collide(p){
          ball.y+ball.size > p.y;
 }
 
+/* ROUND */
+function startRound(isFirst = false){
+  waitingStart = true;
+
+  ball.x = canvas.width/2;
+  ball.y = canvas.height/2;
+
+  trail = []; // limpa trail
+
+  let flashes = 0;
+
+  const interval = setInterval(() => {
+    flashes++;
+
+    ball.size = (ball.size === 10) ? 0 : 10;
+
+    if(flashes >= 4){
+      clearInterval(interval);
+
+      ball.size = 10;
+      waitingStart = false;
+
+      let direction;
+
+      if(isFirst){
+        direction = Math.random() < 0.5 ? -1 : 1;
+      } else {
+        direction = lastScored === 1 ? -1 : 1;
+      }
+
+      ball.dx = 4 * direction;
+      ball.dy = (Math.random()*4 - 2);
+    }
+
+  }, 200);
+}
+
 /* UPDATE */
 function update(){
+  if(waitingStart) return;
+
   movePlayers();
   ai();
 
+  /* ACELERAÇÃO PROGRESSIVA COM LIMITE */
+  if(Math.abs(ball.dx) < maxSpeed){
+    ball.dx *= (1 + speedIncrease);
+    ball.dy *= (1 + speedIncrease);
+  }
+
   ball.x += ball.dx;
   ball.y += ball.dy;
+
+  /* TRAIL */
+  trail.push({x: ball.x, y: ball.y});
+  if(trail.length > maxTrail){
+    trail.shift();
+  }
 
   if(ball.y <= 0 || ball.y >= canvas.height - ball.size){
     ball.dy *= -1;
@@ -83,18 +194,22 @@ function update(){
 
   if(collide(p1) || collide(p2)){
     ball.dx *= -1;
+    ball.dx *= 1.05;
+    ball.dy *= 1.05;
   }
 
   if(ball.x < 0){
     score2++;
+    lastScored = 2;
     checkEnd();
-    resetBall();
+    startRound();
   }
 
   if(ball.x > canvas.width){
     score1++;
+    lastScored = 1;
     checkEnd();
-    resetBall();
+    startRound();
   }
 
   document.getElementById("score1").innerText = score1;
@@ -106,19 +221,14 @@ function checkEnd(){
   if(score1 >= maxRounds || score2 >= maxRounds){
     cancelAnimationFrame(animationId);
 
+    fadeOutMusic();
+
     document.getElementById("gameWrap").style.display = "none";
     document.getElementById("endScreen").style.display = "flex";
 
     const winner = score1 > score2 ? "Jogador 1 venceu!" : "Jogador 2 venceu!";
     document.getElementById("winnerText").innerText = winner;
   }
-}
-
-/* RESET */
-function resetBall(){
-  ball.x = canvas.width/2;
-  ball.y = canvas.height/2;
-  ball.dx *= -1;
 }
 
 /* DRAW */
@@ -134,7 +244,21 @@ function draw(){
   ctx.fillStyle = "white";
   ctx.fillRect(p1.x,p1.y,p1.w,p1.h);
   ctx.fillRect(p2.x,p2.y,p2.w,p2.h);
-  ctx.fillRect(ball.x,ball.y,ball.size,ball.size);
+
+  /* TRAIL AZUL */
+  for(let i = 0; i < trail.length; i++){
+    let t = trail[i];
+    let alpha = i / trail.length;
+
+    ctx.fillStyle = `rgba(0, 255, 255, ${alpha * 0.5})`;
+    ctx.fillRect(t.x, t.y, ball.size, ball.size);
+  }
+
+  /* BOLA */
+  if(ball.size > 0){
+    ctx.fillStyle = "white";
+    ctx.fillRect(ball.x,ball.y,ball.size,ball.size);
+  }
 }
 
 /* LOOP */
