@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Androx</title>
+
+<style>
+body {
+  margin: 0;
+  background-color: #020617;
+  background-image: url("./BGMENU.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: white;
+  font-family: Arial;
+  overflow: hidden;
+}
+
+/* 🔥 INTRO SIMPLES (NÃO QUEBRA NADA) */
+#intro {
+  position: fixed;
+  inset: 0;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 1.5s ease, background 1.5s ease;
+}
+
+#introText {
+  font-size: 18px;
+  letter-spacing: 3px;
+  opacity: 0.8;
+}
+
+/* MENU / END */
+#menu, #endScreen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.box {
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+h1 {
+  margin-bottom: 5px;
+  letter-spacing: 4px;
+  text-shadow: 0 0 15px cyan;
+}
+
+.author {
+  margin-bottom: 15px;
+  font-size: 14px;
+  opacity: 0.7;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px cyan;
+}
+
+select, button {
+  width: 200px;
+  padding: 10px;
+  margin-top: 10px;
+  background: #020617;
+  border: 1px solid #334155;
+  color: white;
+  border-radius: 6px;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:hover {
+  background: cyan;
+  color: black;
+}
+
+#gameWrap {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* HUD */
+#hud {
+  position: absolute;
+  top: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 30px;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px cyan;
+}
+
+/* ANDRA UI (NÃO MEXIDO) */
+#andraContainer {
+  position:absolute;
+  right:30px;
+  top:50%;
+  transform:translateY(-50%);
+  display:none;
+  flex-direction:column;
+  align-items:center;
+}
+
+#andraFrame {
+  width:150px;
+  height:150px;
+  padding:6px;
+  border-radius:12px;
+  background: white;
+  border: 2px solid cyan;
+  box-shadow: 0 0 10px cyan, 0 0 20px rgba(0,255,255,0.5), inset 0 0 10px rgba(0,255,255,0.3);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+#andraFrame img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+#andraName{
+  margin-top:10px;
+  letter-spacing:4px;
+  text-shadow: 0 0 10px cyan, 0 0 20px cyan;
+  font-weight:bold;
+}
+
+/* 🔥 CARD ANDRA (RESTORED COMPLETO) */
+#andraProfile {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 260px;
+  z-index: 10;
+}
+
+#andraProfileBox {
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(0,255,255,0.3);
+  box-shadow: 0 0 10px rgba(0,255,255,0.4), inset 0 0 10px rgba(0,255,255,0.2);
+  padding: 15px;
+}
+
+#andraProfileBox h2 {
+  margin: 0 0 10px 0;
+  text-align: center;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px cyan;
+  font-size: 16px;
+}
+
+#andraText {
+  max-height: 180px;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  padding-right: 5px;
+}
+
+#andraText::-webkit-scrollbar {
+  width: 6px;
+}
+
+#andraText::-webkit-scrollbar-thumb {
+  background: cyan;
+  border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔥 INTRO -->
+<div id="intro">
+  <div id="introText">Carregando experiência...</div>
+</div>
+
+<div id="menu">
+  <div class="box">
+    <h1>ANDROX</h1>
+    <p class="author">Autor: Renato André</p>
+
+    <div>Modo</div>
+    <select id="mode">
+      <option value="1">1 Jogador</option>
+      <option value="2">2 Jogadores</option>
+    </select>
+
+    <div>Dificuldade</div>
+    <select id="difficulty">
+      <option value="0.05">Fácil</option>
+      <option value="0.1">Médio</option>
+      <option value="0.2">Difícil</option>
+    </select>
+
+    <div>Rounds</div>
+    <select id="rounds">
+      <option value="3">3</option>
+      <option value="5">5</option>
+      <option value="10">10</option>
+    </select>
+
+    <button id="startBtn">JOGAR</button>
+  </div>
+</div>
+
+<!-- ANDRA PROFILE (NÃO ALTERADO) -->
+<div id="andraProfile">
+  <div id="andraProfileBox">
+    <h2>Sobre Andra</h2>
+    <div id="andraText">
+      Andra entra em cada partida como quem já conhece o jogo…
+      mas ainda assim quer sentir cada momento dele.
+      Seu jeito é calmo, quase suave — mas nunca distraído.
+      Ela observa, aprende, se ajusta… e quando percebe, já está ditando o ritmo.
+      Gosta quando o jogo responde à sua presença.
+      Quando cada movimento tem retorno, quando o outro lado acompanha… ou tenta.
+      Há algo no desafio que a prende — não pela vitória em si, mas pela troca que acontece durante o caminho.
+      E quanto mais o jogo se equilibra, mais ela se envolve.
+      Andra não força atenção. Ela naturalmente a atrai.
+      E quando o ritmo encaixa… ela apenas continua — como se já soubesse que você não vai querer parar.
+    </div>
+  </div>
+</div>
+
+<div id="gameWrap">
+  <div id="hud">
+    <span id="score1">0</span> : <span id="score2">0</span>
+  </div>
+
+  <canvas id="game" width="700" height="400"></canvas>
+
+  <div id="andraContainer">
+    <div id="andraFrame">
+      <img id="andraSprite" src="./Neutra.png">
+    </div>
+    <div id="andraName">ANDRA</div>
+  </div>
+</div>
+
+<div id="endScreen" style="display:none;">
+  <div class="box">
+    <h1 id="winnerText"></h1>
+    <button onclick="location.reload()">Jogar novamente</button>
+  </div>
+</div>
+
+<audio id="bgMusic" loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="menuMusic" loop>
+  <source src="lia.mp3" type="audio/mpeg">
+</audio>
+
+<script src="game.js"></script>
+
+<script>
+const intro = document.getElementById("intro");
+const menuMusic = document.getElementById("menuMusic");
+
+menuMusic.volume = 0.4;
+
+/* 🔥 INTRO FUNCIONAL SEM QUEBRAR NADA */
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    intro.style.background = "white";
+
+    setTimeout(() => {
+      intro.style.opacity = "0";
+
+      // 🔥 música só começa depois da intro estar visível no menu
+      menuMusic.play().catch(() => {});
+
+      setTimeout(() => {
+        intro.remove();
+      }, 1500);
+
+    }, 1200);
+
+  }, 1200);
+});
+
+/* fallback de áudio */
+document.addEventListener("click", () => {
+  menuMusic.play().catch(() => {});
+}, { once: true });
+
+/* parar música ao iniciar jogo */
+document.getElementById("startBtn").addEventListener("click", () => {
+  menuMusic.pause();
+  menuMusic.currentTime = 0;
+});
+</script>
+
+</body>
+</html>
